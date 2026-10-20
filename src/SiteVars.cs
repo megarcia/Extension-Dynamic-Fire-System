@@ -270,8 +270,8 @@ namespace Landis.Extension.DynamicFire
             //    return 0;
             // }
             ushort max = 0;
-            foreach (ISpecies species in PlugIn.ModelCore.Species)
-                foreach (ISpeciesCohorts speciesCohorts in Cohorts[site][species])
+            // foreach (ISpecies species in PlugIn.ModelCore.Species)
+                foreach (ISpeciesCohorts speciesCohorts in Cohorts) // [site][species])
                     foreach (ICohort cohort in speciesCohorts)
                         if (cohort.Data.Age > max)
                             max = cohort.Data.Age;
