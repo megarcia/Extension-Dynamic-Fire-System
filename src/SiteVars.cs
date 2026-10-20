@@ -1,5 +1,6 @@
 //  Authors:  Robert M. Scheller, Brian R. Miranda 
 
+using System;
 using Landis.Library.UniversalCohorts;
 using Landis.SpatialModeling;
 
@@ -7,6 +8,7 @@ namespace Landis.Extension.DynamicFire
 {
     public static class SiteVars
     {
+        private static ISiteVar<SiteCohorts> cohorts;
         private static ISiteVar<Event> eventVar;
         private static ISiteVar<int> timeOfLastFire;
         private static ISiteVar<IFireRegion> fire_regions;
@@ -20,26 +22,18 @@ namespace Landis.Extension.DynamicFire
         private static ISiteVar<bool> disturbed;
         private static ISiteVar<double> travelTime;
         private static ISiteVar<double> minNeighborTravelTime;
-        //private static ISiteVar<double> simpleTravelTime;
         private static ISiteVar<double> rateOfSpread;
         private static ISiteVar<double> isi;
         private static ISiteVar<double> adjROS;
         private static ISiteVar<double> costTime;
         private static ISiteVar<ushort> groundSlope;
         private static ISiteVar<ushort> uphillSlopeAzimuth;
-
         private static ISiteVar<ushort> siteWindSpeed;
         private static ISiteVar<ushort> siteWindDirection;
 
-        private static ISiteVar<SiteCohorts> cohorts;
-
-        //---------------------------------------------------------------------
-
         public static void Initialize()
         {
-
-            cohorts = PlugIn.ModelCore.GetSiteVar<SiteCohorts>("Succession.UniversalCohorts");
-            
+            cohorts = PlugIn.ModelCore.GetSiteVar<SiteCohorts>("Succession.UniversalCohorts");            
             eventVar            = PlugIn.ModelCore.Landscape.NewSiteVar<Event>(InactiveSiteMode.DistinctValues);
             timeOfLastFire      = PlugIn.ModelCore.Landscape.NewSiteVar<int>();
             fire_regions          = PlugIn.ModelCore.Landscape.NewSiteVar<IFireRegion>();
@@ -59,8 +53,8 @@ namespace Landis.Extension.DynamicFire
             siteWindDirection   = PlugIn.ModelCore.Landscape.NewSiteVar<ushort>();
 
             //Also initialize topography, will be overwritten if optional parameters provided:
-            SiteVars.GroundSlope.ActiveSiteValues = 0;
-            SiteVars.UphillSlopeAzimuth.ActiveSiteValues = 0;
+            GroundSlope.ActiveSiteValues = 0;
+            UphillSlopeAzimuth.ActiveSiteValues = 0;
 
             //Initialize TimeSinceLastFire to the maximum cohort age:
             foreach (ActiveSite site in PlugIn.ModelCore.Landscape)
@@ -69,108 +63,96 @@ namespace Landis.Extension.DynamicFire
                 timeOfLastFire[site] = PlugIn.ModelCore.StartTime - maxAge;
             }
 
-
-            PlugIn.ModelCore.RegisterSiteVar(SiteVars.FireRegion, "Fire.FireRegion");
-            PlugIn.ModelCore.RegisterSiteVar(SiteVars.Severity, "Fire.Severity");
-            PlugIn.ModelCore.RegisterSiteVar(SiteVars.LastSeverity, "Fire.LastSeverity");
-            PlugIn.ModelCore.RegisterSiteVar(SiteVars.TimeOfLastFire, "Fire.TimeOfLastEvent");
+            PlugIn.ModelCore.RegisterSiteVar(FireRegion, "Fire.FireRegion");
+            PlugIn.ModelCore.RegisterSiteVar(Severity, "Fire.Severity");
+            PlugIn.ModelCore.RegisterSiteVar(LastSeverity, "Fire.LastSeverity");
+            PlugIn.ModelCore.RegisterSiteVar(TimeOfLastFire, "Fire.TimeOfLastEvent");
         }
-
-        //---------------------------------------------------------------------
 
         public static void InitializeFuelType()
         {
-            PlugIn.ModelCore.UI.WriteLine("   Initializing Fuel Type.");
-
+            PlugIn.ModelCore.UI.WriteLine("   Initializing Fuel Types");
             cfsFuelType     = PlugIn.ModelCore.GetSiteVar<int>("Fuels.CFSFuelType");
             decidFuelType   = PlugIn.ModelCore.GetSiteVar<int>("Fuels.DecidFuelType");
             percentConifer  = PlugIn.ModelCore.GetSiteVar<int>("Fuels.PercentConifer");
             percentHardwood = PlugIn.ModelCore.GetSiteVar<int>("Fuels.PercentHardwood");
             percentDeadFir  = PlugIn.ModelCore.GetSiteVar<int>("Fuels.PercentDeadFir");
-
-            if (SiteVars.CFSFuelType == null)
-                throw new System.ApplicationException("Error: CFS Fuel Type NOT Initialized.  Fuel extension MUST be active.");
-
-            //SiteVars.PercentDeadFir.ActiveSiteValues = 0;
-
+            if (CFSFuelType == null)
+                throw new ApplicationException("Error: CFS Fuel Type NOT Initialized.  Fuel extension MUST be active.");
         }
-
-        //---------------------------------------------------------------------
 
         public static ISiteVar<IFireRegion> FireRegion
         {
-            get {
+            get 
+            {
                 return fire_regions;
             }
         }
 
-        //---------------------------------------------------------------------
-
         public static ISiteVar<int> TimeOfLastFire
         {
-            get {
+            get 
+            {
                 return timeOfLastFire;
             }
         }
-        //---------------------------------------------------------------------
+
         public static ISiteVar<Event> Event
         {
-            get {
+            get 
+            {
                 return eventVar;
             }
         }
 
-        //---------------------------------------------------------------------
-
         public static ISiteVar<int> CFSFuelType
         {
-            get {
+            get 
+            {
                 return cfsFuelType;
             }
         }
-        //---------------------------------------------------------------------
 
         public static ISiteVar<int> DecidFuelType
         {
-            get {
+            get 
+            {
                 return decidFuelType;
             }
         }
-        //---------------------------------------------------------------------
 
         public static ISiteVar<int> PercentConifer
         {
-            get {
+            get 
+            {
                 return percentConifer;
             }
         }
 
-        //---------------------------------------------------------------------
-
         public static ISiteVar<int> PercentHardwood
         {
-            get {
+            get 
+            {
                 return percentHardwood;
             }
         }
-        //---------------------------------------------------------------------
 
         public static ISiteVar<int> PercentDeadFir
         {
-            get {
+            get 
+            {
                 return percentDeadFir;
             }
         }
-        //---------------------------------------------------------------------
 
         public static ISiteVar<byte> Severity
         {
-            get {
+            get 
+            {
                 return severity;
             }
         }
 
-        //---------------------------------------------------------------------
         public static ISiteVar<byte> LastSeverity
         {
             get
@@ -179,47 +161,46 @@ namespace Landis.Extension.DynamicFire
             }
         }
 
-        //---------------------------------------------------------------------
-
         public static ISiteVar<bool> Disturbed
         {
-            get {
+            get 
+            {
                 return disturbed;
             }
         }
-        //---------------------------------------------------------------------
 
         public static ISiteVar<double> TravelTime
         {
-            get {
+            get 
+            {
                 return travelTime;
             }
         }
-        //---------------------------------------------------------------------
 
         public static ISiteVar<double> MinNeighborTravelTime
         {
-            get {
+            get 
+            {
                 return minNeighborTravelTime;
             }
         }
-        //---------------------------------------------------------------------
 
         public static ISiteVar<double> RateOfSpread
         {
-            get {
+            get 
+            {
                 return rateOfSpread;
             }
         }
-        //---------------------------------------------------------------------
 
         public static ISiteVar<double> ISI
         {
-            get {
+            get 
+            {
                 return isi;
             }
         }
-        //---------------------------------------------------------------------
+
         public static ISiteVar<double> AdjROS
         {
             get
@@ -227,7 +208,7 @@ namespace Landis.Extension.DynamicFire
                 return adjROS;
             }
         }
-        //---------------------------------------------------------------------
+
         public static ISiteVar<double> CostTime
         {
             get
@@ -235,22 +216,22 @@ namespace Landis.Extension.DynamicFire
                 return costTime;
             }
         }
-        //---------------------------------------------------------------------
         public static ISiteVar<ushort> GroundSlope
         {
-            get {
+            get 
+            {
                 return groundSlope;
             }
         }
-        //---------------------------------------------------------------------
 
         public static ISiteVar<ushort> UphillSlopeAzimuth
         {
-            get {
+            get 
+            {
                 return uphillSlopeAzimuth;
             }
         }
-        //---------------------------------------------------------------------
+
         public static ISiteVar<ushort> SiteWindSpeed
         {
             get
@@ -259,7 +240,6 @@ namespace Landis.Extension.DynamicFire
             }
         }
 
-        //---------------------------------------------------------------------
         public static ISiteVar<ushort> SiteWindDirection
         {
             get
@@ -267,8 +247,6 @@ namespace Landis.Extension.DynamicFire
                 return siteWindDirection;
             }
         }
-
-        //---------------------------------------------------------------------
 
         public static ISiteVar<SiteCohorts> Cohorts
         {
@@ -278,24 +256,18 @@ namespace Landis.Extension.DynamicFire
             }
         }
 
-        //---------------------------------------------------------------------
         public static ushort GetMaxAge(ActiveSite site)
         {
-            if (SiteVars.Cohorts[site] == null)
-            {
-                PlugIn.ModelCore.UI.WriteLine("Cohort are null.");
-                return 0;
-            }
+            // if (Cohorts[site] == null)
+            // {
+            //    PlugIn.ModelCore.UI.WriteLine("Cohort are null.");
+            //    return 0;
+            // }
             ushort max = 0;
-
-            foreach (ISpeciesCohorts speciesCohorts in SiteVars.Cohorts[site])
-            {
+            foreach (ISpeciesCohorts speciesCohorts in Cohorts[site])
                 foreach (ICohort cohort in speciesCohorts)
-                {
                     if (cohort.Data.Age > max)
                         max = cohort.Data.Age;
-                }
-            }
             return max;
         }
     }
