@@ -1,6 +1,7 @@
 //  Authors:  Robert M. Scheller, Brian R. Miranda 
 
 using System;
+using Landis.Core;
 using Landis.Library.UniversalCohorts;
 using Landis.SpatialModeling;
 
@@ -33,7 +34,12 @@ namespace Landis.Extension.DynamicFire
 
         public static void Initialize()
         {
-            cohorts = PlugIn.ModelCore.GetSiteVar<SiteCohorts>("Succession.UniversalCohorts");            
+            cohorts = PlugIn.ModelCore.GetSiteVar<SiteCohorts>("Succession.UniversalCohorts"); 
+            if (cohorts == null)
+            {
+                string mesg = string.Format("Cohorts are empty. Check that this Disturbance extension is compatible with your chosen Succession extension.");
+                throw new ApplicationException(mesg);
+            }
             eventVar            = PlugIn.ModelCore.Landscape.NewSiteVar<Event>(InactiveSiteMode.DistinctValues);
             timeOfLastFire      = PlugIn.ModelCore.Landscape.NewSiteVar<int>();
             fire_regions          = PlugIn.ModelCore.Landscape.NewSiteVar<IFireRegion>();
@@ -264,10 +270,11 @@ namespace Landis.Extension.DynamicFire
             //    return 0;
             // }
             ushort max = 0;
-            foreach (ISpeciesCohorts speciesCohorts in Cohorts[site])
-                foreach (ICohort cohort in speciesCohorts)
-                    if (cohort.Data.Age > max)
-                        max = cohort.Data.Age;
+            foreach (ISpecies species in PlugIn.ModelCore.Species)
+                foreach (ISpeciesCohorts speciesCohorts in Cohorts[site][species])
+                    foreach (ICohort cohort in speciesCohorts)
+                        if (cohort.Data.Age > max)
+                            max = cohort.Data.Age;
             return max;
         }
     }
