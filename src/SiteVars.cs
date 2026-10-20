@@ -42,13 +42,13 @@ namespace Landis.Extension.DynamicFire
             }
             eventVar            = PlugIn.ModelCore.Landscape.NewSiteVar<Event>(InactiveSiteMode.DistinctValues);
             timeOfLastFire      = PlugIn.ModelCore.Landscape.NewSiteVar<int>();
-            fire_regions          = PlugIn.ModelCore.Landscape.NewSiteVar<IFireRegion>();
+            fire_regions        = PlugIn.ModelCore.Landscape.NewSiteVar<IFireRegion>();
             percentDeadFir      = PlugIn.ModelCore.Landscape.NewSiteVar<int>();
             severity            = PlugIn.ModelCore.Landscape.NewSiteVar<byte>();
             lastSeverity        = PlugIn.ModelCore.Landscape.NewSiteVar<byte>();
             disturbed           = PlugIn.ModelCore.Landscape.NewSiteVar<bool>();
             travelTime          = PlugIn.ModelCore.Landscape.NewSiteVar<double>();
-            minNeighborTravelTime     = PlugIn.ModelCore.Landscape.NewSiteVar<double>();
+            minNeighborTravelTime = PlugIn.ModelCore.Landscape.NewSiteVar<double>();
             rateOfSpread        = PlugIn.ModelCore.Landscape.NewSiteVar<double>();
             adjROS              = PlugIn.ModelCore.Landscape.NewSiteVar<double>();
             isi                 = PlugIn.ModelCore.Landscape.NewSiteVar<double>();
@@ -264,18 +264,15 @@ namespace Landis.Extension.DynamicFire
 
         public static ushort GetMaxAge(ActiveSite site)
         {
-            // if (Cohorts[site] == null)
-            // {
-            //    PlugIn.ModelCore.UI.WriteLine("Cohort are null.");
-            //    return 0;
-            // }
-            ushort max = 0;
-            // foreach (ISpecies species in PlugIn.ModelCore.Species)
-                foreach (ISpeciesCohorts speciesCohorts in Cohorts) // [site][species])
+            ushort maxAge = 0;
+            if (Cohorts[site] != null)
+            {
+                foreach (ISpeciesCohorts speciesCohorts in Cohorts[site])
                     foreach (ICohort cohort in speciesCohorts)
-                        if (cohort.Data.Age > max)
-                            max = cohort.Data.Age;
-            return max;
+                        if (cohort.Data.Age > maxAge)
+                            maxAge = cohort.Data.Age;
+            }
+            return maxAge;
         }
     }
 }
