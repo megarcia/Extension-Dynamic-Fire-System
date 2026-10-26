@@ -342,9 +342,11 @@ namespace Landis.Extension.DynamicFire
                 el.ISI = fireEvent.ISI;
                 el.SitesChecked = fireEvent.NumSitesChecked;
                 el.CohortsKilled = fireEvent.CohortsKilled;
-                ModelCore.UI.WriteLine("   Fire event at row {0} col {1} killed {2} cohorts", fireEvent.StartLocation.Row, fireEvent.StartLocation.Column, fireEvent.CohortsKilled);
                 el.MeanSeverity = fireEvent.EventSeverity;
                 el.DamagedSites = fireEvent.NumberDamagedSites;
+                ModelCore.UI.WriteLine("   Fire event at row {0} col {1} with severity {2} killed {3} cohorts on {4} sites",
+                                       fireEvent.StartLocation.Row, fireEvent.StartLocation.Column, fireEvent.EventSeverity,
+                                       fireEvent.CohortsKilled, fireEvent.NumberDamagedSites);
                 eventLog.AddObject(el);
                 eventLog.WriteToFile();
             }
