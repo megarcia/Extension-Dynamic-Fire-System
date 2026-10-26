@@ -114,7 +114,7 @@ namespace Landis.Extension.DynamicFire
         ///</summary>
         public override void Run()
         {
-            ModelCore.UI.WriteLine("Processing landscape for Fire events ...");
+            ModelCore.UI.WriteLine("   Processing landscape for Fire events ...");
             SiteVars.InitializeFuelType();
             if (FireRegions.Dataset.Count == 0)
                 throw new ApplicationException("Fire region data set is empty.");
